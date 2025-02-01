@@ -19,19 +19,19 @@ class GraphData(BaseModel):
 
 @app.post("/label_propagation")
 def label_propagation(graph: GraphData):
-    g = ig.Graph(edges=graph.c_edges)
+    g = ig.Graph.TupleList(graph.c_edges, directed=False)
     communities = g.community_label_propagation()
     return {"communities": [list(comm) for comm in communities]}
 
 @app.post("/walktrap")
 def walktrap(graph: GraphData):
-    g = ig.Graph(edges=graph.c_edges)
+    g = ig.Graph.TupleList(graph.c_edges, directed=False)
     communities = g.community_walktrap().as_clustering()
     return {"communities": [list(comm) for comm in communities]}
 
 @app.post("/infomap")
 def infomap(graph: GraphData):
-    g = ig.Graph(edges=graph.c_edges)
+    g = ig.Graph.TupleList(graph.c_edges, directed=False)
     communities = g.community_infomap()
     return {"communities": [list(comm) for comm in communities]}
 
