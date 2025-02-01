@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import igraph as ig
 from typing import List
+import random
 
 app = FastAPI()
 
@@ -14,11 +15,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+def set_fixed_seed(seed=42):
+    random.seed(seed)
+    ig.set_random_number_generator(random)
+
 class GraphData(BaseModel):
     c_edges: List[List[int]]
 
 @app.post("/label_propagation")
 def label_propagation(graph: GraphData):
+    set_fixed_seed()
     g = ig.Graph(edges=graph.c_edges)
     communities = g.community_label_propagation()
     return {"communities": [list(comm) for comm in communities]}
@@ -31,6 +37,7 @@ def walktrap(graph: GraphData):
 
 @app.post("/infomap")
 def infomap(graph: GraphData):
+    set_fixed_seed()
     g = ig.Graph(edges=graph.c_edges)
     communities = g.community_infomap()
     return {"communities": [list(comm) for comm in communities]}
