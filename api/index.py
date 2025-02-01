@@ -6,7 +6,6 @@ from typing import List
 
 app = FastAPI()
 
-# 允许 CORS 访问（ObservableHQ 需要）
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -16,23 +15,23 @@ app.add_middleware(
 )
 
 class GraphData(BaseModel):
-    edges: List[List[int]]
+    c_edges: List[List[int]]
 
 @app.post("/label_propagation")
 def label_propagation(graph: GraphData):
-    g = ig.Graph(edges=graph.edges)
+    g = ig.Graph(edges=graph.c_edges)
     communities = g.community_label_propagation()
     return {"communities": [list(comm) for comm in communities]}
 
 @app.post("/walktrap")
 def walktrap(graph: GraphData):
-    g = ig.Graph(edges=graph.edges)
+    g = ig.Graph(edges=graph.c_edges)
     communities = g.community_walktrap().as_clustering()
     return {"communities": [list(comm) for comm in communities]}
 
 @app.post("/infomap")
 def infomap(graph: GraphData):
-    g = ig.Graph(edges=graph.edges)
+    g = ig.Graph(edges=graph.c_edges)
     communities = g.community_infomap()
     return {"communities": [list(comm) for comm in communities]}
 
