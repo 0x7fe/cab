@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import igraph as ig
-from typing import List
+from typing import List, Optional
 import random
 
 app = FastAPI()
@@ -21,24 +21,35 @@ def set_fixed_seed(seed=42):
 
 class GraphData(BaseModel):
     c_edges: List[List[int]]
+    weights: Optional[List[float]] = None
 
 @app.post("/label_propagation")
 def label_propagation(graph: GraphData):
     set_fixed_seed()
-    g = ig.Graph(edges=graph.c_edges)
-    communities = g.community_label_propagation()
+    if graph.weights:
+        g = ig.Graph(edges=graph.c_edges, edge_attrs={'weight': graph.weights})
+    else:
+        g = ig.Graph(edges=graph.c_edges)
+    communities = g.community_label_propagation(weights=g.es['weight'])
     return {"communities": [list(comm) for comm in communities]}
 
 @app.post("/walktrap")
 def walktrap(graph: GraphData):
-    g = ig.Graph(edges=graph.c_edges)
-    communities = g.community_walktrap().as_clustering()
+    set_fixed_seed()
+    if graph.weights:
+        g = ig.Graph(edges=graph.c_edges, edge_attrs={'weight': graph.weights})
+    else:
+        g = ig.Graph(edges=graph.c_edges)
+    communities = g.community_walktrap(weights=g.es['weight']).as_clustering()
     return {"communities": [list(comm) for comm in communities]}
 
 @app.post("/infomap")
 def infomap(graph: GraphData):
     set_fixed_seed()
-    g = ig.Graph(edges=graph.c_edges)
+    if graph.weights:
+        g = ig.Graph(edges=graph.c_edges, edge_attrs={'weight': graph.weights})
+    else:
+        g = ig.Graph(edges=graph.c_edges)
     communities = g.community_infomap()
     return {"communities": [list(comm) for comm in communities]}
 
