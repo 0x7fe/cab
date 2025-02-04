@@ -23,9 +23,13 @@ class GraphData(BaseModel):
     c_edges: List[List[int]]
     weights: Optional[List[float]] = None
 
+@app.post("/set_seed")
+def set_seed(seed):
+    set_fixed_seed(seed.seed)
+    return {"seed": seed.seed}
+
 @app.post("/label_propagation")
 def label_propagation(graph: GraphData):
-    set_fixed_seed()
     if graph.weights:
         g = ig.Graph(edges=graph.c_edges, edge_attrs={'weights': graph.weights})
     else:
@@ -35,7 +39,6 @@ def label_propagation(graph: GraphData):
 
 @app.post("/walktrap")
 def walktrap(graph: GraphData):
-    set_fixed_seed()
     if graph.weights:
         g = ig.Graph(edges=graph.c_edges, edge_attrs={'weights': graph.weights})
     else:
@@ -45,7 +48,6 @@ def walktrap(graph: GraphData):
 
 @app.post("/infomap")
 def infomap(graph: GraphData):
-    set_fixed_seed()
     if graph.weights:
         g = ig.Graph(edges=graph.c_edges, edge_attrs={'weights': graph.weights})
     else:
@@ -57,3 +59,5 @@ def infomap(graph: GraphData):
 def home():
     return {"message": "Hello from FastAPI on Vercel!"}
 
+
+set_fixed_seed()
