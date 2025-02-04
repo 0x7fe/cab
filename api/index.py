@@ -23,8 +23,11 @@ class GraphData(BaseModel):
     c_edges: List[List[int]]
     weights: Optional[List[float]] = None
 
+class Seed(BaseModel):
+    seed: int
+
 @app.post("/seed")
-def set_seed(seed):
+def set_seed(seed: Seed):
     set_fixed_seed(seed.seed)
     return {"seed": seed.seed}
 
