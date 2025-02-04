@@ -27,30 +27,30 @@ class GraphData(BaseModel):
 def label_propagation(graph: GraphData):
     set_fixed_seed()
     if graph.weights:
-        g = ig.Graph(edges=graph.c_edges, edge_attrs={'weight': graph.weights})
+        g = ig.Graph(edges=graph.c_edges, edge_attrs={'weights': graph.weights})
     else:
         g = ig.Graph(edges=graph.c_edges)
-    communities = g.community_label_propagation(weights=g.es['weight'])
+    communities = g.community_label_propagation(weights=g.es['weights'])
     return {"communities": [list(comm) for comm in communities]}
 
 @app.post("/walktrap")
 def walktrap(graph: GraphData):
     set_fixed_seed()
     if graph.weights:
-        g = ig.Graph(edges=graph.c_edges, edge_attrs={'weight': graph.weights})
+        g = ig.Graph(edges=graph.c_edges, edge_attrs={'weights': graph.weights})
     else:
         g = ig.Graph(edges=graph.c_edges)
-    communities = g.community_walktrap(weights=g.es['weight']).as_clustering()
+    communities = g.community_walktrap(weights=g.es['weights']).as_clustering()
     return {"communities": [list(comm) for comm in communities]}
 
 @app.post("/infomap")
 def infomap(graph: GraphData):
     set_fixed_seed()
     if graph.weights:
-        g = ig.Graph(edges=graph.c_edges, edge_attrs={'weight': graph.weights})
+        g = ig.Graph(edges=graph.c_edges, edge_attrs={'weights': graph.weights})
     else:
         g = ig.Graph(edges=graph.c_edges)
-    communities = g.community_infomap()
+    communities = g.community_infomap(edge_weights=g.es['weights'])
     return {"communities": [list(comm) for comm in communities]}
 
 @app.get("/")
